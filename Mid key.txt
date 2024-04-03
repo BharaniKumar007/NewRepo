@@ -1,0 +1,115 @@
+/* Q1 (10 points). Display all attributes of products 
+with either “tent” or “sandal” in the product name 
+which have a product price in the range of $50.00 to $150.00. */
+
+# Between keyword
+SELECT *
+FROM   PRODUCT
+WHERE  (ProductName LIKE "%tent%" OR ProductName LIKE "%sandal%") # PARENTHESES REQUIRED
+AND    ProductPrice BETWEEN 50.00 AND 150.00;
+
+# No Between keyword
+SELECT *
+FROM   PRODUCT
+WHERE  (ProductName LIKE "%tent%" OR ProductName LIKE "%sandal%") # PARENTHESES REQUIRED
+AND    ProductPrice >= 50.00 AND ProductPrice <= 150.00;
+
+
+/* Q2 (10 points). Display a list of stores located in the region named “Tristate”.  
+Show the following atributes: store ID, store zip, region ID, region name.  
+Sort the results by region name and store zip. */
+
+# No Alias
+SELECT   StoreID, StoreZip, STORE.RegionID, RegionName
+FROM     STORE, REGION
+WHERE    STORE.RegionID = REGION.RegionID
+AND      RegionName = "Tristate"
+ORDER BY StoreZip;
+
+# Alias
+SELECT   StoreID, StoreZip, R.RegionID, RegionName
+FROM     STORE AS S, REGION AS R
+WHERE    S.RegionID = R.RegionID
+AND      RegionName = "Tristate"
+ORDER BY RegionName, StoreZip;
+
+# Alias used throughout
+SELECT   S.StoreID, S.StoreZip, R.RegionID, R.RegionName
+FROM     STORE AS S, REGION AS R
+WHERE    S.RegionID = R.RegionID
+AND      R.RegionName = "Tristate"
+ORDER BY R.RegionName, S.StoreZip;
+
+# JOIN
+SELECT   S.StoreID, S.StoreZip, R.RegionID, R.RegionName
+FROM     STORE AS S JOIN REGION AS R ON S.RegionID = R.RegionID
+WHERE    R.RegionName = "Tristate"
+ORDER BY R.RegionName, S.StoreZip;
+
+# NATURAL JOIN
+SELECT   StoreID, StoreZip, STORE.RegionID, RegionName
+FROM     STORE NATURAL JOIN REGION
+WHERE    RegionName = "Tristate"
+ORDER BY StoreZip;
+
+
+/* Q3 (10 points). Display a list of sales transactions 
+which include products with a product price of less than $200.00, 
+showing transaction ID, transaction date, product ID, product price, 
+product price after a 15% discount, and quantity. */
+
+SELECT SALESTRANSACTION.TID, TDate, 
+	   PRODUCT.ProductID, ProductPrice, ProductPrice * 0.85, Quantity
+FROM   SALESTRANSACTION, INCLUDES, PRODUCT
+WHERE  SALESTRANSACTION.TID = INCLUDES.TID AND INCLUDES.ProductID = PRODUCT.ProductID
+AND    ProductPrice < 200.00;
+
+ 
+/* Q4 (10 points). Display a list of customers who have purchased products 
+in the category named “Cycling”, 
+showing customer name, transaction date, quantity, and product name. */
+
+SELECT CustomerName, TDate, Quantity, ProductName
+FROM   CUSTOMER, SALESTRANSACTION, INCLUDES, PRODUCT, CATEGORY
+WHERE  CUSTOMER.CustomerID = SALESTRANSACTION.CustomerID AND
+       SALESTRANSACTION.TID = INCLUDES.TID AND
+	   INCLUDES.ProductID = PRODUCT.ProductID AND
+       PRODUCT.CategoryID = CATEGORY.CategoryID 
+AND    CategoryName = "Cycling";
+
+
+/* Q5 (10 points). Display a list of zip codes where one or more stores are located.  
+Eliminate duplicate zip codes.  Use the fewest tables needed in your query. */
+
+SELECT DISTINCT StoreZip
+FROM   STORE;
+
+
+
+/* Q6 (10 points). Display a list of zip codes where either 
+1) a store is located or 
+2) a customer resides.  Use the keyword UNION. */
+
+SELECT StoreZip
+FROM   STORE
+UNION
+SELECT CustomerZip
+FROM   CUSTOMER;
+
+SELECT DISTINCT StoreZip
+FROM   STORE
+UNION
+SELECT DISTINCT CustomerZip
+FROM   CUSTOMER;
+
+
+/* Q7 (10 points). The price associated with product ID “4X4” is increased by 20%.  
+Update the database accordingly. */
+
+SELECT * FROM PRODUCT WHERE ProductID = "4X4"; # NOT REQUIRED
+
+UPDATE PRODUCT
+SET    ProductPrice = ProductPrice * 1.2
+WHERE  ProductID = "4X4";
+
+SELECT * FROM PRODUCT WHERE ProductID = "4X4"; # NOT REQUIRED
